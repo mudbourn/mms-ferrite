@@ -1,0 +1,112 @@
+plugins {
+    id 'net.fabricmc.fabric-loom-remap' version '1.17.14'
+}
+
+version = project.mod_version
+group = project.maven_group
+
+base {
+    archivesName = project.archives_base_name
+}
+
+repositories {
+    mavenCentral()
+    maven { url "https://api.modrinth.com/maven" }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings loom.officialMojangMappings()
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:0.141.4+1.21.11"
+}
+
+loom {
+    runs {
+        configureEach {
+            // OpenJ9 dev runs without system core dumps
+            if (System.getProperty("java.vm.name").contains("OpenJ9")) {
+                vmArg "-Xdump:system:none"
+            }
+        }
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    it.options.release = 21
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+    withSourcesJar()
+}
+
+processResources {
+    inputs.property "mod_version", project.mod_version
+    filesMatching("fabric.mod.json") {
+        expand "version": project.mod_version
+    }
+}
+
+jar {
+    from("LICENSE") {
+        rename { "${it}_${project.base.archivesName.get()}" }
+    }
+}
+
+// Native targets as Rust triple, jar folder and library file name
+def nativeTargets = [
+    [triple: 'aarch64-apple-darwin', folder: 'macos-aarch64', file: 'libmms_ferrite_native.dylib'],
+    [triple: 'x86_64-unknown-linux-gnu', folder: 'linux-x86_64', file: 'libmms_ferrite_native.so']
+]
+
+def nativeDir = file("$projectDir/native")
+def rustSysroot = providers.exec { commandLine 'rustc', '--print', 'sysroot' }
+    .standardOutput.asText.map { it.trim() }
+
+def cargoTasks = nativeTargets.collect { target ->
+    def name = target.folder.split('-').collect { it.capitalize() }.join('')
+    tasks.register("cargoBuild${name}", Exec) {
+        workingDir nativeDir
+        commandLine 'cargo', 'build', '--release', '--target', target.triple
+        inputs.dir("$nativeDir/src")
+        inputs.file("$nativeDir/Cargo.toml")
+        outputs.file("$nativeDir/target/${target.triple}/release/${target.file}")
+        onlyIf("Rust std for ${target.triple} is installed") {
+            def ready = file("${rustSysroot.get()}/lib/rustlib/${target.triple}").isDirectory()
+            if (!ready) {
+                logger.warn(
+                    "Skipping native ${target.triple}: no Rust std for it, jar ships without this library"
+                )
+            }
+            ready
+        }
+    }
+}
+
+def packNatives = tasks.register('packNatives', Copy) {
+    dependsOn cargoTasks
+    into layout.buildDirectory.dir('natives')
+    nativeTargets.each { target ->
+        from("$nativeDir/target/${target.triple}/release/${target.file}") {
+            into "natives/${target.folder}"
+        }
+    }
+}
+
+processResources {
+    from(packNatives)
+}
+
+// Fails the build when a plain class sits in a mixin package
+def checkMixinPackages = tasks.register('checkMixinPackages', Exec) {
+    dependsOn tasks.named('remapJar')
+    doFirst {
+        commandLine 'python3',
+                "$projectDir/gradle/scripts/check-mixin-packages.py",
+                tasks.named('remapJar').get().archiveFile.get().asFile
+    }
+}
+
+tasks.named('build') { dependsOn checkMixinPackages }

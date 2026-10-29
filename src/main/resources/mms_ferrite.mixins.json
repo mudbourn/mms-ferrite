@@ -1,0 +1,29 @@
+{
+  "required": true,
+  "package": "info.mudbourn.ferrite.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "AbstractFurnaceBlockEntityAccessor",
+    "ClassInstanceMultiMapAccessor",
+    "CrammingCancelMixin",
+    "DoubleInventoryExtractHintMixin",
+    "EntityCellMixin",
+    "EntityGetterMixin",
+    "EntitySectionCallbackMixin",
+    "EntitySectionMixin",
+    "EntitySectionStorageMixin",
+    "FurnaceStackChangeMixin",
+    "HopperBlockEntityInvoker",
+    "HopperExtractHintMaintainMixin",
+    "HopperHintExtractRouteMixin",
+    "HopperHintValidatorMixin",
+    "LootableContainerExtractHintMixin",
+    "SignEditorChangeMixin",
+    "TransientEntitySectionCallbackMixin",
+    "WorldChunkBlockEntityTickerGateMixin",
+    "WorldChunkInvoker"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

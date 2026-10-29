@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "mms_ferrite",
+  "version": "${version}",
+  "name": "MMS Ferrite",
+  "description": "1.21.11 backport of Ferrite by VoiceLessQ. Carries the vanilla-preserving performance features: Rust cramming, entity query index and collider skip, sign and furnace ticker gates, and the hopper extract hint.",
+  "authors": [
+    "VoiceLessQ",
+    "mudbourn"
+  ],
+  "contact": {
+    "sources": "https://github.com/VoiceLessQ/Ferrite"
+  },
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "info.mudbourn.ferrite.MmsFerrite"
+    ]
+  },
+  "mixins": [
+    "mms_ferrite.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.16.0",
+    "minecraft": "~1.21.11",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
+}
