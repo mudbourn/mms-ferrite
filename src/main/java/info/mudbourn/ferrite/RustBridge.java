@@ -34,13 +34,22 @@ public final class RustBridge {
     private static String resourcePath() {
         String os = System.getProperty("os.name").toLowerCase(Locale.ROOT);
         String arch = System.getProperty("os.arch").toLowerCase(Locale.ROOT);
-        boolean arm = arch.equals("aarch64") || arch.equals("arm64");
-        boolean x64 = arch.equals("amd64") || arch.equals("x86_64");
-        if (os.contains("mac") && arm) {
-            return "/natives/macos-aarch64/libmms_ferrite_native.dylib";
+        String cpu;
+        if (arch.equals("aarch64") || arch.equals("arm64")) {
+            cpu = "aarch64";
+        } else if (arch.equals("amd64") || arch.equals("x86_64")) {
+            cpu = "x86_64";
+        } else {
+            throw new UnsupportedOperationException("no native library for " + os + " " + arch);
         }
-        if (os.contains("linux") && x64) {
-            return "/natives/linux-x86_64/libmms_ferrite_native.so";
+        if (os.contains("mac")) {
+            return "/natives/macos-" + cpu + "/libmms_ferrite_native.dylib";
+        }
+        if (os.contains("linux")) {
+            return "/natives/linux-" + cpu + "/libmms_ferrite_native.so";
+        }
+        if (os.contains("windows") && cpu.equals("x86_64")) {
+            return "/natives/windows-x86_64/mms_ferrite_native.dll";
         }
         throw new UnsupportedOperationException("no native library for " + os + " " + arch);
     }
