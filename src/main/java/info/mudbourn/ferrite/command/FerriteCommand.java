@@ -99,7 +99,7 @@ public final class FerriteCommand {
 
     private static int logMonitors(CommandContext<CommandSourceStack> ctx, boolean on) {
         MonitorLog.ENABLED = on;
-        FerriteConfig.set(FerriteConfig.KEY_LOG_MONITORS, on, !MonitorLog.SMALL_HEAP);
+        FerriteConfig.set(FerriteConfig.KEY_LOG_MONITORS, on, false);
         return reply(ctx, "[log] monitor reports " + (on ? "on" : "off"), true);
     }
 
