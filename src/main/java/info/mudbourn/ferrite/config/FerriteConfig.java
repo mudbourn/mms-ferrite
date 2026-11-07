@@ -1,6 +1,7 @@
 package info.mudbourn.ferrite.config;
 
 import info.mudbourn.ferrite.MmsFerrite;
+import info.mudbourn.ferrite.client.SoftValueMap;
 import info.mudbourn.ferrite.entity.CrammingDispatcher;
 import info.mudbourn.ferrite.monitor.HopperHintMonitor;
 import info.mudbourn.ferrite.monitor.MonitorLog;
@@ -20,6 +21,7 @@ public final class FerriteConfig {
     public static final String KEY_CRAMMING = "cramming";
     public static final String KEY_HOPPER_HINT = "hopper-hint";
     public static final String KEY_LOG_MONITORS = "log-monitors";
+    public static final String KEY_SOFT_BAKE_CACHE = "soft-bake-cache";
 
     private static final String FILE_NAME = "mms_ferrite.properties";
     private static final Properties STATE = new Properties();
@@ -60,9 +62,13 @@ public final class FerriteConfig {
         if (value != null) {
             MonitorLog.ENABLED = Boolean.parseBoolean(value);
         }
+        value = STATE.getProperty(KEY_SOFT_BAKE_CACHE);
+        if (value != null) {
+            SoftValueMap.ENABLED = Boolean.parseBoolean(value);
+        }
         for (String key : STATE.stringPropertyNames()) {
             switch (key) {
-                case KEY_CRAMMING, KEY_HOPPER_HINT, KEY_LOG_MONITORS -> {
+                case KEY_CRAMMING, KEY_HOPPER_HINT, KEY_LOG_MONITORS, KEY_SOFT_BAKE_CACHE -> {
                 }
                 default -> MmsFerrite.LOGGER.warn("Unknown key \"{}\" in {} (ignored)", key, FILE_NAME);
             }

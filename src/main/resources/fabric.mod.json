@@ -19,7 +19,11 @@
     ]
   },
   "mixins": [
-    "mms_ferrite.mixins.json"
+    "mms_ferrite.mixins.json",
+    {
+      "config": "mms_ferrite.client.mixins.json",
+      "environment": "client"
+    }
   ],
   "depends": {
     "fabricloader": ">=0.16.0",
