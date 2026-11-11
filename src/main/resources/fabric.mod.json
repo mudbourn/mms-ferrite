@@ -16,6 +16,9 @@
   "entrypoints": {
     "main": [
       "info.mudbourn.ferrite.MmsFerrite"
+    ],
+    "client": [
+      "info.mudbourn.ferrite.client.FerriteClient"
     ]
   },
   "mixins": [
