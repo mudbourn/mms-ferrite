@@ -3,7 +3,9 @@
   "package": "info.mudbourn.ferrite.mixin.client",
   "compatibilityLevel": "JAVA_21",
   "client": [
-    "ModelBakerOperationCacheMixin"
+    "ModelBakerOperationCacheMixin",
+    "XaeroMinimapWriteBudgetMixin",
+    "XaeroWorldMapWriteBudgetMixin"
   ],
   "injectors": {
     "defaultRequire": 1
