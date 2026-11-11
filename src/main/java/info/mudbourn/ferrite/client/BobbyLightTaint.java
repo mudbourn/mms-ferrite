@@ -39,17 +39,31 @@ public final class BobbyLightTaint {
         }
         if (delta == 0) {
             DataLayer restored = original.remove(pos);
+            byte[] stored = BobbyLightStore.get(engine, pos);
+            if (stored != null) {
+                BobbyLightStore.forget(engine, pos);
+                restored = new DataLayer(stored);
+            }
             if (restored != null) {
                 current.put(pos, restored);
             }
             return true;
         }
-        DataLayer source = original.get(pos);
+        DataLayer heapSource = original.get(pos);
+        if (heapSource != null) {
+            current.put(pos, shift(heapSource, delta));
+            return true;
+        }
+        byte[] stored = BobbyLightStore.get(engine, pos);
+        if (stored != null) {
+            current.put(pos, new DataLayer(shift(stored, delta)));
+            return true;
+        }
+        DataLayer source = current.get(pos);
         if (source == null) {
-            source = current.get(pos);
-            if (source == null) {
-                return true;
-            }
+            return true;
+        }
+        if (!BobbyLightStore.put(engine, pos, source)) {
             original.put(pos, source);
         }
         current.put(pos, shift(source, delta));
@@ -57,17 +71,21 @@ public final class BobbyLightTaint {
     }
 
     private static DataLayer shift(DataLayer source, int delta) {
-        byte[] dst = new byte[LAYER_BYTES];
         if (source.isDefinitelyHomogenous()) {
+            byte[] dst = new byte[LAYER_BYTES];
             int value = clamp(source.get(0, 0, 0) + delta);
             Arrays.fill(dst, (byte) (value | (value << 4)));
             return new DataLayer(dst);
         }
-        byte[] src = source.getData();
+        return new DataLayer(shift(source.getData(), delta));
+    }
+
+    private static byte[] shift(byte[] src, int delta) {
+        byte[] dst = new byte[LAYER_BYTES];
         if (!nativeKernel || !shiftNative(src, dst, delta)) {
             shiftJava(src, dst, delta);
         }
-        return new DataLayer(dst);
+        return dst;
     }
 
     private static boolean shiftNative(byte[] src, byte[] dst, int delta) {

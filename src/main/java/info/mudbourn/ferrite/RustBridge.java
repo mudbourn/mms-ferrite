@@ -21,6 +21,19 @@ public final class RustBridge {
     // Adds delta to every 4-bit value of a 2048-byte light layer, clamped to 0..15.
     public static native boolean shiftNibbles(byte[] src, byte[] dst, int delta);
 
+    // Compressed store of 2048-byte light layers keyed by owner and section position.
+    public static native boolean lightStorePut(long owner, long pos, byte[] layer);
+
+    public static native boolean lightStoreGet(long owner, long pos, byte[] out);
+
+    public static native boolean lightStoreRemove(long owner, long pos);
+
+    public static native void lightStoreClearOwner(long owner);
+
+    public static native long lightStoreCount();
+
+    public static native long lightStoreBytes();
+
     private static boolean load() {
         try {
             String resource = resourcePath();

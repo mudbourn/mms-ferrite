@@ -3,8 +3,9 @@
   "package": "info.mudbourn.ferrite.mixin.client",
   "compatibilityLevel": "JAVA_21",
   "client": [
-    "BobbyStarlightTaintMixin",
-    "BobbyVanillaTaintMixin",
+    "BobbySerializerMixin",
+    "BobbyStarlightLightMixin",
+    "BobbyVanillaLightMixin",
     "EntityRenderDispatcherAccessor",
     "LivingEntityRendererAccessor",
     "ModelBakerOperationCacheMixin",

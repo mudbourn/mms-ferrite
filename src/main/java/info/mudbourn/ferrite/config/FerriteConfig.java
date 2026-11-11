@@ -1,6 +1,7 @@
 package info.mudbourn.ferrite.config;
 
 import info.mudbourn.ferrite.MmsFerrite;
+import info.mudbourn.ferrite.client.BobbyLightStore;
 import info.mudbourn.ferrite.client.BobbyLightTaint;
 import info.mudbourn.ferrite.client.SoftValueMap;
 import info.mudbourn.ferrite.client.WorldLeakFix;
@@ -21,6 +22,7 @@ import net.fabricmc.loader.api.FabricLoader;
 // Persists module toggles in config/mms_ferrite.properties as deltas from defaults.
 public final class FerriteConfig {
 
+    public static final String KEY_BOBBY_LIGHT_STORE = "bobby-light-store";
     public static final String KEY_BOBBY_LIGHT_TAINT = "bobby-light-taint";
     public static final String KEY_CRAMMING = "cramming";
     public static final String KEY_HOPPER_HINT = "hopper-hint";
@@ -56,7 +58,11 @@ public final class FerriteConfig {
     }
 
     private static void apply() {
-        String value = STATE.getProperty(KEY_BOBBY_LIGHT_TAINT);
+        String value = STATE.getProperty(KEY_BOBBY_LIGHT_STORE);
+        if (value != null) {
+            BobbyLightStore.ENABLED = Boolean.parseBoolean(value);
+        }
+        value = STATE.getProperty(KEY_BOBBY_LIGHT_TAINT);
         if (value != null) {
             BobbyLightTaint.ENABLED = Boolean.parseBoolean(value);
         }
@@ -86,7 +92,8 @@ public final class FerriteConfig {
         }
         for (String key : STATE.stringPropertyNames()) {
             switch (key) {
-                case KEY_BOBBY_LIGHT_TAINT,
+                case KEY_BOBBY_LIGHT_STORE,
+                    KEY_BOBBY_LIGHT_TAINT,
                     KEY_CRAMMING,
                     KEY_HOPPER_HINT,
                     KEY_LOG_MONITORS,
