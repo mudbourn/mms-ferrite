@@ -1,6 +1,7 @@
 package info.mudbourn.ferrite.config;
 
 import info.mudbourn.ferrite.MmsFerrite;
+import info.mudbourn.ferrite.client.BobbyLightTaint;
 import info.mudbourn.ferrite.client.SoftValueMap;
 import info.mudbourn.ferrite.client.WorldLeakFix;
 import info.mudbourn.ferrite.client.XaeroWriteBudget;
@@ -20,6 +21,7 @@ import net.fabricmc.loader.api.FabricLoader;
 // Persists module toggles in config/mms_ferrite.properties as deltas from defaults.
 public final class FerriteConfig {
 
+    public static final String KEY_BOBBY_LIGHT_TAINT = "bobby-light-taint";
     public static final String KEY_CRAMMING = "cramming";
     public static final String KEY_HOPPER_HINT = "hopper-hint";
     public static final String KEY_LOG_MONITORS = "log-monitors";
@@ -54,7 +56,11 @@ public final class FerriteConfig {
     }
 
     private static void apply() {
-        String value = STATE.getProperty(KEY_CRAMMING);
+        String value = STATE.getProperty(KEY_BOBBY_LIGHT_TAINT);
+        if (value != null) {
+            BobbyLightTaint.ENABLED = Boolean.parseBoolean(value);
+        }
+        value = STATE.getProperty(KEY_CRAMMING);
         if (value != null) {
             CrammingDispatcher.ENABLED = Boolean.parseBoolean(value);
         }
@@ -80,7 +86,13 @@ public final class FerriteConfig {
         }
         for (String key : STATE.stringPropertyNames()) {
             switch (key) {
-                case KEY_CRAMMING, KEY_HOPPER_HINT, KEY_LOG_MONITORS, KEY_SOFT_BAKE_CACHE, KEY_WORLD_LEAK_FIX, KEY_XAERO_WRITE_BUDGET -> {
+                case KEY_BOBBY_LIGHT_TAINT,
+                    KEY_CRAMMING,
+                    KEY_HOPPER_HINT,
+                    KEY_LOG_MONITORS,
+                    KEY_SOFT_BAKE_CACHE,
+                    KEY_WORLD_LEAK_FIX,
+                    KEY_XAERO_WRITE_BUDGET -> {
                 }
                 default -> MmsFerrite.LOGGER.warn("Unknown key \"{}\" in {} (ignored)", key, FILE_NAME);
             }

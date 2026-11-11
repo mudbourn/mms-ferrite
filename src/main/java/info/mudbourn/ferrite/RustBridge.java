@@ -18,6 +18,9 @@ public final class RustBridge {
     // Packed cramming inputs to accumulated pushes, one call per tick.
     public static native void computeCramming(ByteBuffer requests, ByteBuffer results, int entityCount);
 
+    // Adds delta to every 4-bit value of a 2048-byte light layer, clamped to 0..15.
+    public static native boolean shiftNibbles(byte[] src, byte[] dst, int delta);
+
     private static boolean load() {
         try {
             String resource = resourcePath();
@@ -26,7 +29,7 @@ public final class RustBridge {
             MmsFerrite.LOGGER.info("Loaded native {}", resource);
             return true;
         } catch (IOException | RuntimeException | LinkageError e) {
-            MmsFerrite.LOGGER.warn("Native library unavailable, cramming stays vanilla: {}", e.toString());
+            MmsFerrite.LOGGER.warn("Native library unavailable, native features use their Java fallback or stay off: {}", e.toString());
             return false;
         }
     }
